@@ -592,6 +592,6 @@ twoway (tsline GDP) ///
 	   scheme(white_tableau) ///
 	   xlabel(, angle(45)) ///
 	   tline(85, lcolor(red) lpattern(dash)) ///
-	   title("{bf}Previsão - GDP", pos(11) size(2.75)) ///
-       legend(label(1 "GDP") label(2 "Previsão Estática") label(3 "IC - 95%")) 
+	   title("{bf}Forecast - GDP", pos(11) size(2.75)) ///
+       legend(label(1 "GDP") label(2 "Static Forecast") label(3 "IC - 95%")) 
 
