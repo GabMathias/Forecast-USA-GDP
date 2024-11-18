@@ -80,7 +80,7 @@ tsline GDP, ///
 egen GDP_medio = mean(GDP)
 
 *Include average in graph
-twoway (tsline GDP, legend(label(1 "GDP"))) (tsline GDP_medio, legend(label(2 "GDP Médio"))), ///
+twoway (tsline GDP, legend(label(1 "GDP"))) (tsline GDP_medio, legend(label(2 "Average GDP"))), ///
      scheme(gg_tableau) /// 
 	 ytitle("Quarterly GDP") ///
 	 xtitle("") ///
@@ -104,14 +104,17 @@ graph export "GDP.png", as(png)
 * 1.1.1) Estimate: Dy =  alpha*y + drift + trend*t + e
 *** H0: alpha = drift = trend = 0 (The series is not stationary)
 dfuller GDP, trend 
+	* Do not reject H0, Z(t)=-1.288>Z(5%)=-3.467 | P-Value = 89.09%>5%
 
 * 1.1.2) Estimate: Dy =  alpha*y + drift + e
 *** H0: alpha = drift = 0 (The series is not stationary)
 dfuller GDP, drift 
+	* Do not reject H0, Z(t)= 1.002>Z(5%)=-1.664 | P-Value = 84.04%>5%
 
 * 1.1.3) Estimate: Dy =  alpha*y  + e
 *** H0: alpha = 0 (The series is not stationary)
 dfuller GDP, nocons 
+	* Do not reject H0, Z(t)=12.802>Z(5%)=--1,950 
 
 *In all tests we do not reject the null hypothesis, therefore the series is not stationary.
 *When there is an autocorrelation process in the series, the Dickey-Fuller test tends not to reject more often that the series has a unit root. 
@@ -129,23 +132,23 @@ dfuller GDP, nocons
 
 * 1.2.1) Estimate: Dy =  alpha*y + drift + trend*t + e
 *** H0: alpha = drift = trend = 0 (The series is not stationary)
-dfuller GDP, trend lags(11) regress
+dfuller GDP, trend lags(11) regress		
+	* Do not reject H0, Z(t)=-2.641 >Z(5%)=-3.478 | P-Value = 26.15%>5%
 
-*In the regression we can see that the p-value of 26.15% is greater than the significance level of 5%, i.e. we do not reject the null hypothesis.
-*We also see that the p-value of the constant and the trend variable have p-values ​​within the significance level, so it makes sense to consider them.
-
+	*We can visualize that the p-value of the constant and the trend variable have p-values ​​within the significance level, so it makes sense to consider them.
+	*trend_ P-Value = 0.01
+	*cons_ P-Value = 0.006
+	
 * 1.2.2) Estimate: Dy =  alpha*y + drift + e
 *** H0: alpha = drift = 0 (The series is not stationary)
 dfuller GDP, drift lags(11) regress
-
-*In the regression we can observe that the p-value 62.88% is greater than the significance level of 5%, that is, we do not reject the null hypothesis. 
-*We also observe that the p-value of the constant has a p-value within the significance level, that is, the constant continues to be statistically significant.
+	* Do not reject H0, Z(t)=0.330>Z(5%)=-3.467 | P-Value = 62.88%>5%
+	
 
 * 1.2.3) Estimate: Dy =  alpha*y  + e
 *** H0: alpha = 0 (The series is not stationary)
 dfuller GDP, nocons lags(11) regress
-
-*In the regression we can observe that the Z statistic value of 2.448 is greater than the critical value of –1.950, that is, we do not reject the null hypothesis.
+	* Do not reject H0, Z(t)=2.448>Z(5%)=-1.950
 
 
 *We can conclude from the tests and graphical analysis that the series is not stationary.
@@ -161,14 +164,17 @@ dfuller GDP, nocons lags(11) regress
 * 1.3.1) Estimate: Dy =  alpha*y + drift + trend*t + e
 *** H0: alpha = drift = trend = 0 (The series is not stationary)
 pperron GDP, trend 
+* Do not reject H0, Z(t)=-1.925>Z(5%)=-3.467 | P-Value = 64.14%>5%
 	 
 * 1.3.2) Estimate: Dy =  alpha*y + drift + e
 *** H0: alpha = drift = 0 (The series is not stationary)
 pperron GDP
+* Do not reject H0, Z(t)=0.616>Z(5%)=-2.904| P-Value = 98.80%>5%
 
 * 1.3.3) Estimate: Dy =  alpha*y  + e
 *** H0: alpha = 0 (The series is not stationary)
 pperron GDP, nocons 
+* Do not reject H0, Z(t)= 8.785>Z(5%)=-1.950
 
 *The PHILLIPS-PERRON tests corroborate the results of the DICKEY-FULLER test, so we can confidently conclude that the series is not stationary.
    
@@ -193,7 +199,7 @@ tsline dGDP, ///
      title("{bf}GDP - EUA", pos(11) size(2.75))
 	
 	 
-* INCLUDE AVERAGE RETURN IN THE GRAPH
+* INCLUDE AVERAGE VARIATION IN THE GRAPH
 * Create variable with the average
 egen dGDP_medio = mean(dGDP)
 
@@ -204,8 +210,18 @@ twoway (tsline dGDP, legend(label(1 "dGDP"))) (tsline dGDP_medio, legend(label(2
 	 xtitle("") ///
 	 xlabel(, angle(45)) ///
 	 title("{bf}GDP - EUA", pos(11) size(2.75))
+	 
+	* We can infer from the graphic that the series presents stable behavior around the average.
 
-* We can infer from the graphic that the series presents stable behavior around the average.
+	 
+* Visualize GDP and GDP Variation on same Graphic	 
+	 twoway (tsline GDP, legend(label(1 "GDP"))) (tsline dGDP, legend(label(2 "GDP Variation"))), ///
+     scheme(gg_tableau) /// 
+	 ytitle("") ///
+	 xtitle("") ///
+	 xlabel(, angle(45)) ///
+     title("{bf}GDP Variation - USA", pos(11) size(2.75))
+
 
 ***********************************************************
 ******* 2.2) CHECK STATIONARITY OF THE FIRST DIFFERENCE
@@ -216,15 +232,18 @@ twoway (tsline dGDP, legend(label(1 "dGDP"))) (tsline dGDP_medio, legend(label(2
 * 2.2.1.1) Estima: Dy =  alpha*y + drift + trend*t + e
 *** H0: alpha = drift = trend = 0 (The series is not stationary)
 dfuller dGDP, trend 
+	* Rejects H0, Z(t)=-5.825<Z(5%)=-3.468 | P-Value = 0.00%<5%
 
 * 2.2.1.2) Estima: Dy =  alpha*y + drift + e
 *** H0: alpha = drift = 0 (The series is not stationary)
 dfuller dGDP, drift 
+	* Rejects H0, Z(t)=-5.823<Z(5%)=-1.664  | P-Value = 0.00%<5% 
 
 * 2.2.1.3) Estima: Dy =  alpha*y  + e
 *** H0: alpha = 0 ((The series is not stationary)
 dfuller dGDP, nocons 
-
+	* Rejects H0, Z(t)=-2.863 <Z(5%)=-1.950 
+	
 *In all tests we reject the null hypothesis, therefore the series is stationary
 
 ***********************************************************
@@ -234,24 +253,17 @@ dfuller dGDP, nocons
 * 2.2.2.1) Estimate: Dy =  alpha*y + drift + trend*t + e
 *** H0: alpha = drift = trend = 0 (The series is not stationary)
 dfuller dGDP, trend lags(11) regress
-
-*In the regression we can observe that the p-value of 0% is less than the significance level of 5%, that is, we reject the null hypothesis.
+	* Do not reject H0, Z(t)=-2.866>Z(5%)=-3.468 | P-Value = 17.37%>5%
 
 * 2.2.2.2) Estimate: Dy =  alpha*y + drift + e
 *** H0: alpha = drift = 0 (The series is not stationary)
 dfuller dGDP, drift lags(11) regress
-
-*In the regression we can observe that the p-value of 0% is less than the significance level of 5%, that is, we reject the null hypothesis.
-
+	* Rejects H0, Z(t)=-2.870<Z(5%)= -1.672  | P-Value = 00.29%<5%
 
 * 2.2.2.3) Estimate: Dy =  alpha*y  + e
 *** H0: alpha = 0 (The series is not stationary)
 dfuller dGDP, nocons lags(11) regress
-
-*In the regression, we can see that the value of the Z(t) statistic of –2.944 is greater in modulus than the critical value of –1.950, i.e., we reject the null hypothesis.
-*It is to the right of the critical value of 1%.
-
-
+	* Do not reject H0, Z(t)=-0.610>Z(5%)=-3.468
 
 ***********************************************************
 * 2.2.3) PHILLIPS-PERRON
@@ -260,16 +272,20 @@ dfuller dGDP, nocons lags(11) regress
 * 2.2.3.1) Estima: Dy =  alpha*y + drift + trend*t + e
 *** H0: alpha = drift = trend = 0 (The series is not stationary)
 pperron dGDP, trend 
+	* Rejects H0, Z(t)=-5.914<Z(5%)=-3.468  | P-Value = 0.00%<5%
 	 
 * 2.2.3.2) Estima: Dy =  alpha*y + drift + e
 *** H0: alpha = drift = 0 (The series is not stationary)
 pperron dGDP
+	* Rejects H0, Z(t)=-5.901<Z(5%)=-2.904  
 
 * 2.2.3.3) Estima: Dy =  alpha*y  + e
 *** H0: alpha = 0 (The series is not stationary)
 pperron dGDP, nocons 
+	* Rejects H0, Z(t)=-2.464<Z(5%)=-1.950 
 
-*The PHILLIPS-PERRON tests corroborate the results of the DICKEY-FULLER test, so we can confidently conclude that the series is stationary at first difference.
+* EVEN THOUGH THERE IS EVIDENCE THAT THE SERIES IS NOT STATIONARY USING THE AUGMENTED DICKEY-FULLER, THE OTHERS INDICATE STATIONARITY, AND THE GRAPH INDICATES A STATIONARY SERIES.
+* WE HAVE EVIDENCE THAT VARIATION IN GDP IS STATIONARY
 ***********************************************************
 * 3.1) GRAPH ACF (AUTOCORRELATION FUNCTION): ac var
 ***********************************************************
